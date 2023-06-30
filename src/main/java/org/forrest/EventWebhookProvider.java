@@ -14,7 +14,7 @@ import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmProvider;
 
 import java.io.IOException;
-import java.util.Arrays;
+import java.util.Base64;
 
 public class EventWebhookProvider implements EventListenerProvider {
     private static final Logger log = Logger.getLogger(EventWebhookProvider.class);
@@ -110,7 +110,9 @@ public class EventWebhookProvider implements EventListenerProvider {
                     .addHeader("User-Agent", "Keycloak Event Webhook");
 
             if (config.getUsername() != null && config.getPassword() != null) {
-                builder.addHeader("Authorization", "Basic " + config.getUsername() + ":" + Arrays.toString(config.getPassword().toCharArray()));
+                String sourceString = config.getUsername() + ":" + config.getPassword();
+	            String encodedString = Base64.getEncoder().encodeToString(sourceString.getBytes());
+                builder.addHeader("Authorization", "Basic " + encodedString);
             }
 
             Request request = builder.post(formBody)
