@@ -15,10 +15,11 @@ import org.keycloak.models.RealmProvider;
 
 import java.io.IOException;
 import java.util.Base64;
+import java.util.concurrent.TimeUnit;
 
 public class EventWebhookProvider implements EventListenerProvider {
     private static final Logger log = Logger.getLogger(EventWebhookProvider.class);
-    private final OkHttpClient httpClient = new OkHttpClient();
+    private final OkHttpClient httpClient = new OkHttpClient.Builder().connectTimeout(3, TimeUnit.SECONDS).writeTimeout(3, TimeUnit.SECONDS).readTimeout(3, TimeUnit.SECONDS).build();
     private final ObjectMapper objectMapper = new ObjectMapper();
     public static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
     private final Config config;
@@ -126,8 +127,13 @@ public class EventWebhookProvider implements EventListenerProvider {
 
                 @Override
                 public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
-                    log.debug(response);
-                    log.info("Sent successfully");
+                    try (Response res = response) {
+                        if (res.isSuccessful()) {
+                            log.info("Sent successfully, code: " + res.code());
+                        } else {
+                            log.warn("Webhook returned error code: " + res.code());
+                        }
+                    }
                 }
             });
         } catch (Exception e) {
