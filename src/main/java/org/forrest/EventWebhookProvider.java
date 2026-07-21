@@ -15,6 +15,7 @@ import org.keycloak.models.RealmProvider;
 
 import java.io.IOException;
 import java.util.Base64;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 public class EventWebhookProvider implements EventListenerProvider {
@@ -51,6 +52,7 @@ public class EventWebhookProvider implements EventListenerProvider {
                     .ipAddress(event.getIpAddress())
                     .error(event.getError())
                     .details(event.getDetails())
+                    .sessionId(event.getSessionId())
                     .build();
             String evt = objectMapper.writeValueAsString(userEvent);
 

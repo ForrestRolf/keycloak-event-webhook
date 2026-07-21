@@ -14,5 +14,6 @@ public class UserEvent {
     String userId;
     String ipAddress;
     String error;
+    String sessionId;
     Map<String, String> details;
 }
